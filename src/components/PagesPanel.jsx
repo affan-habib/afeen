@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPage, addPage } from '../store/pagesSlice';
 
-const Sidebar = () => {
+const PagesPanel = () => {
   const dispatch = useDispatch();
   const pages = useSelector((state) => state.pages.pages);
   const selectedPageId = useSelector((state) => state.pages.selectedPageId);
@@ -16,16 +16,15 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="fixed left-0 top-16 bottom-0 w-64 bg-gray-50 border-r border-gray-300 p-4">
+    <div className="fixed right-0 top-16 bottom-0 w-64 bg-gray-50 border-r border-gray-300 p-4">
       <h2 className="text-lg font-semibold mb-4">Pages</h2>
       <ul className="space-y-2">
         {pages.map((page) => (
           <li
             key={page.id}
             onClick={() => handleSelectPage(page.id)}
-            className={`p-2 rounded cursor-pointer ${
-              page.id === selectedPageId ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'
-            }`}
+            className={`p-2 rounded cursor-pointer ${page.id === selectedPageId ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'
+              }`}
           >
             {page.name}
           </li>
@@ -41,4 +40,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default PagesPanel;

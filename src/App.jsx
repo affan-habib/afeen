@@ -1,7 +1,7 @@
 // src/App.jsx
 import React from 'react';
 import TopBar from './components/TopBar';
-import Sidebar from './components/Sidebar';
+import PagesPanel from './components/PagesPanel';
 import CanvasArea from './components/CanvasArea';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -11,7 +11,7 @@ const App = () => {
             <div className="flex flex-col h-screen">
                 <TopBar />
                 <div className="flex flex-1">
-                    <Sidebar />
+                    <PagesPanel />
                     <CanvasArea />
                 </div>
             </div>
