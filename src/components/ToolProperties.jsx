@@ -1,10 +1,10 @@
 // ToolProperties.js
 import React from 'react';
+import { useSelector } from 'react-redux';
 import TextProperties from './TextProperties';
 import ImageProperties from './ImageProperties';
 
 const ToolProperties = ({
-  activeTool,
   isTextSelected,
   isImageSelected,
   selectionStyles,
@@ -19,11 +19,13 @@ const ToolProperties = ({
   handleImageStyleChange,
   addImageToCanvas,
 }) => {
+  const activeTool = useSelector((state) => state.tool.activeTool); // Access activeTool from Redux store
 
-  console.log(activeTool, isImageSelected, isTextSelected, 'tool img text')
+  console.log(activeTool, isImageSelected, isTextSelected, 'tool img text');
+  
   return (
     <div className="p-4 overflow-y-auto text-sm" style={{ width: '300px' }}>
-      {activeTool == "text" && (
+      {activeTool === "text" && (
         <TextProperties
           selectionStyles={selectionStyles}
           handleStyleChange={handleStyleChange}

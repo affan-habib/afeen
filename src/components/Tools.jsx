@@ -1,15 +1,20 @@
 // Tools.js
 import React from 'react';
 import { FaPencilAlt, FaImage } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { setActiveTool } from '../store/toolSlice';
 
-const Tools = ({ activeTool, setActiveTool, addText }) => {
+const Tools = ({ addText }) => {
+  const dispatch = useDispatch();
+  const activeTool = useSelector((state) => state.tool.activeTool);
+
   const handleTextToolClick = () => {
-    setActiveTool('text');
+    dispatch(setActiveTool('text'));
     addText();
   };
 
   const handleImageToolClick = () => {
-    setActiveTool('image');
+    dispatch(setActiveTool('image'));
   };
 
   return (

@@ -1,5 +1,6 @@
 // CanvasEditor.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import useFabricCanvas from './hooks/useFabricCanvas';
 import useObjectSelection from './hooks/useObjectSelection';
 import useTextEditing from './hooks/useTextEditing';
@@ -17,6 +18,7 @@ const CanvasEditor = () => {
   const [selectedObject, setSelectedObject] = useObjectSelection(canvas);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
+  const activeTool = useSelector((state) => state.tool.activeTool);
 
   const {
     selectionStyles,
@@ -30,7 +32,6 @@ const CanvasEditor = () => {
   } = useTextEditing(canvas, selectedObject);
 
   const { imageStyles, handleImageStyleChange } = useImageEditing(canvas, selectedObject);
-  const [activeTool, setActiveTool] = React.useState(null); // No tool selected by default
 
   const addText = () => {
     if (canvas) {
@@ -58,6 +59,7 @@ const CanvasEditor = () => {
       canvas.renderAll();
     }
   };
+
   const addImageToCanvas = (url) => {
     if (canvas) {
       fabric.Image.fromURL(
@@ -159,14 +161,9 @@ const CanvasEditor = () => {
       <div className="flex flex-1 min-h-0">
         <div className="w-100 h-full overflow-y-auto">
           <div className='flex'>
-            <Tools
-              activeTool={activeTool}
-              setActiveTool={setActiveTool}
-              addText={addText}
-            />
-            {activeTool &&
+            <Tools addText={addText} />
+            {activeTool && (
               <ToolProperties
-                activeTool={activeTool}
                 isTextSelected={isTextSelected}
                 isImageSelected={isImageSelected}
                 selectionStyles={selectionStyles}
@@ -180,7 +177,8 @@ const CanvasEditor = () => {
                 handleCharSpacingChange={handleCharSpacingChange}
                 handleOpacityChange={handleOpacityChange}
                 handleListTypeChange={handleListTypeChange}
-              />}
+              />
+            )}
           </div>
         </div>
         {/* Sidebar and Canvas area */}
