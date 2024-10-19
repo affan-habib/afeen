@@ -13,16 +13,12 @@ import {
   FaFont,
 } from 'react-icons/fa';
 
-const TextProperties = ({
-  selectionStyles,
-  handleStyleChange,
-  handleAlignmentChange,
-  handleTextChange,
-  handleLineHeightChange,
-  handleCharSpacingChange,
-  handleOpacityChange,
-  handleListTypeChange,
-}) => {
+const TextProperties = ({ selectionStyles, updateTextStyle, handleTextChange }) => {
+  const handleToggle = (styleName, currentValue, toggleValue) => {
+    const newValue = currentValue === toggleValue ? 'normal' : toggleValue;
+    updateTextStyle(styleName, newValue);
+  };
+
   return (
     <div className="text-properties">
       {/* Text Alignment */}
@@ -33,7 +29,7 @@ const TextProperties = ({
             className={`p-1 mr-1 border ${
               selectionStyles.textAlign === 'left' ? 'bg-gray-300' : ''
             }`}
-            onClick={() => handleAlignmentChange('left')}
+            onClick={() => updateTextStyle('textAlign', 'left')}
             title="Align Left"
           >
             <FaAlignLeft />
@@ -42,7 +38,7 @@ const TextProperties = ({
             className={`p-1 mr-1 border ${
               selectionStyles.textAlign === 'center' ? 'bg-gray-300' : ''
             }`}
-            onClick={() => handleAlignmentChange('center')}
+            onClick={() => updateTextStyle('textAlign', 'center')}
             title="Align Center"
           >
             <FaAlignCenter />
@@ -51,7 +47,7 @@ const TextProperties = ({
             className={`p-1 mr-1 border ${
               selectionStyles.textAlign === 'right' ? 'bg-gray-300' : ''
             }`}
-            onClick={() => handleAlignmentChange('right')}
+            onClick={() => updateTextStyle('textAlign', 'right')}
             title="Align Right"
           >
             <FaAlignRight />
@@ -60,7 +56,7 @@ const TextProperties = ({
             className={`p-1 mr-1 border ${
               selectionStyles.textAlign === 'justify' ? 'bg-gray-300' : ''
             }`}
-            onClick={() => handleAlignmentChange('justify')}
+            onClick={() => updateTextStyle('textAlign', 'justify')}
             title="Justify"
           >
             <FaAlignJustify />
@@ -74,7 +70,7 @@ const TextProperties = ({
         <select
           className="p-1 border w-full text-sm"
           value={selectionStyles.fontFamily}
-          onChange={(e) => handleStyleChange('fontFamily', e.target.value)}
+          onChange={(e) => updateTextStyle('fontFamily', e.target.value)}
         >
           <option value="Arial">Arial</option>
           <option value="Courier">Courier</option>
@@ -92,7 +88,7 @@ const TextProperties = ({
             className="p-1 border w-full text-sm"
             value={selectionStyles.fontSize}
             onChange={(e) =>
-              handleStyleChange('fontSize', parseInt(e.target.value, 10))
+              updateTextStyle('fontSize', parseInt(e.target.value, 10))
             }
           />
         </div>
@@ -104,10 +100,7 @@ const TextProperties = ({
                 selectionStyles.fontWeight === 'bold' ? 'bg-gray-300' : ''
               }`}
               onClick={() =>
-                handleStyleChange(
-                  'fontWeight',
-                  selectionStyles.fontWeight === 'bold' ? 'normal' : 'bold'
-                )
+                handleToggle('fontWeight', selectionStyles.fontWeight, 'bold')
               }
               title="Bold"
             >
@@ -118,10 +111,7 @@ const TextProperties = ({
                 selectionStyles.fontStyle === 'italic' ? 'bg-gray-300' : ''
               }`}
               onClick={() =>
-                handleStyleChange(
-                  'fontStyle',
-                  selectionStyles.fontStyle === 'italic' ? 'normal' : 'italic'
-                )
+                handleToggle('fontStyle', selectionStyles.fontStyle, 'italic')
               }
               title="Italic"
             >
@@ -132,7 +122,7 @@ const TextProperties = ({
                 selectionStyles.underline ? 'bg-gray-300' : ''
               }`}
               onClick={() =>
-                handleStyleChange('underline', !selectionStyles.underline)
+                updateTextStyle('underline', !selectionStyles.underline)
               }
               title="Underline"
             >
@@ -152,7 +142,7 @@ const TextProperties = ({
             className="p-1 border w-full text-sm"
             value={selectionStyles.lineHeight}
             onChange={(e) =>
-              handleLineHeightChange(parseFloat(e.target.value))
+              updateTextStyle('lineHeight', parseFloat(e.target.value))
             }
           />
         </div>
@@ -163,7 +153,7 @@ const TextProperties = ({
             className="p-1 border w-full text-sm"
             value={selectionStyles.charSpacing}
             onChange={(e) =>
-              handleCharSpacingChange(parseFloat(e.target.value))
+              updateTextStyle('charSpacing', parseFloat(e.target.value))
             }
           />
         </div>
@@ -177,7 +167,7 @@ const TextProperties = ({
             type="color"
             className="p-1 border w-full"
             value={selectionStyles.fill}
-            onChange={(e) => handleStyleChange('fill', e.target.value)}
+            onChange={(e) => updateTextStyle('fill', e.target.value)}
           />
         </div>
         <div className="w-1/2 ml-1">
@@ -189,7 +179,7 @@ const TextProperties = ({
             max="100"
             value={Math.round(selectionStyles.opacity * 100)}
             onChange={(e) =>
-              handleOpacityChange(parseFloat(e.target.value) / 100)
+              updateTextStyle('opacity', parseFloat(e.target.value) / 100)
             }
           />
         </div>
@@ -203,7 +193,7 @@ const TextProperties = ({
             className={`p-1 mr-1 border ${
               selectionStyles.listType === 'ordered' ? 'bg-gray-300' : ''
             }`}
-            onClick={() => handleListTypeChange('ordered')}
+            onClick={() => updateTextStyle('listType', 'ordered')}
             title="Ordered List"
           >
             <FaListOl />
@@ -212,7 +202,7 @@ const TextProperties = ({
             className={`p-1 mr-1 border ${
               selectionStyles.listType === 'unordered' ? 'bg-gray-300' : ''
             }`}
-            onClick={() => handleListTypeChange('unordered')}
+            onClick={() => updateTextStyle('listType', 'unordered')}
             title="Unordered List"
           >
             <FaListUl />
@@ -221,7 +211,7 @@ const TextProperties = ({
             className={`p-1 mr-1 border ${
               selectionStyles.listType === 'none' ? 'bg-gray-300' : ''
             }`}
-            onClick={() => handleListTypeChange('none')}
+            onClick={() => updateTextStyle('listType', 'none')}
             title="No List"
           >
             <FaFont />

@@ -19,21 +19,16 @@ const CanvasEditor = () => {
   const canvas = useFabricCanvas();
   useObjectSelection(canvas);
   const { selectedObject, setSelectedObject } = useObjectSelectionContext();
-  console.log
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
   const activeTool = useSelector((state) => state.tool.activeTool);
 
   const {
     selectionStyles,
-    handleStyleChange,
-    handleAlignmentChange,
+    updateTextStyle,
     handleTextChange,
-    handleLineHeightChange,
-    handleCharSpacingChange,
-    handleOpacityChange,
-    handleListTypeChange,
-  } = useTextEditing(canvas, selectedObject);
+  } = useTextEditing(canvas);
 
   const { imageStyles, handleImageStyleChange } = useImageEditing(canvas, selectedObject);
 
@@ -88,16 +83,11 @@ const CanvasEditor = () => {
             {activeTool && (
               <ToolProperties
                 selectionStyles={selectionStyles}
-                handleStyleChange={handleStyleChange}
-                handleAlignmentChange={handleAlignmentChange}
+                updateTextStyle={updateTextStyle}
                 handleTextChange={handleTextChange}
                 imageStyles={imageStyles}
                 handleImageStyleChange={handleImageStyleChange}
                 addImageToCanvas={addImage}
-                handleLineHeightChange={handleLineHeightChange}
-                handleCharSpacingChange={handleCharSpacingChange}
-                handleOpacityChange={handleOpacityChange}
-                handleListTypeChange={handleListTypeChange}
               />
             )}
           </div>

@@ -1,5 +1,5 @@
 // useTextEditing.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fabric } from 'fabric';
 import { useObjectSelectionContext } from '../context/ObjectSelectionContext';
 
@@ -39,28 +39,15 @@ const useTextEditing = (canvas) => {
       };
     } else {
       // Reset selection styles when no text object is selected
-      setSelectionStyles({
-        text: '',
-        fontWeight: 'normal',
-        fontStyle: 'normal',
-        underline: false,
-        fill: '#000000',
-        fontSize: 20,
-        fontFamily: 'Arial',
-        textAlign: 'left',
-        lineHeight: 1.16,
-        charSpacing: 0,
-        opacity: 1,
-        listType: 'none',
-      });
+      resetSelectionStyles();
     }
   }, [selectedObject]);
 
-  const handleObjectModified = () => {
+  const handleObjectModified = useCallback(() => {
     if (selectedObject && selectedObject instanceof fabric.Textbox) {
       updateSelectionStyles(selectedObject);
     }
-  };
+  }, [selectedObject]);
 
   const updateSelectionStyles = (text) => {
     setSelectionStyles({
@@ -79,16 +66,73 @@ const useTextEditing = (canvas) => {
     });
   };
 
-  const handleStyleChange = (styleName, value) => {
-    if (selectedObject && selectedObject instanceof fabric.Textbox) {
-      selectedObject.set(styleName, value);
-      canvas.requestRenderAll();
-      updateSelectionStyles(selectedObject);
-    }
+  const resetSelectionStyles = () => {
+    setSelectionStyles({
+      text: '',
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      underline: false,
+      fill: '#000000',
+      fontSize: 20,
+      fontFamily: 'Arial',
+      textAlign: 'left',
+      lineHeight: 1.16,
+      charSpacing: 0,
+      opacity: 1,
+      listType: 'none',
+    });
   };
 
-  const handleAlignmentChange = (alignment) => {
-    handleStyleChange('textAlign', alignment);
+  const updateTextStyle = (styleName, value) => {
+    if (!selectedObject || !(selectedObject instanceof fabric.Textbox)) return;
+
+    let updatedValue = value;
+
+    // Handle special cases
+    switch (styleName) {
+      case 'charSpacing':
+        updatedValue = value * 1000; // Convert to 1/1000 em
+        break;
+      case 'opacity':
+        updatedValue = value; // Expecting a value between 0 and 1
+        break;
+      case 'listType':
+        applyListType(value);
+        return; // listType is handled separately
+      default:
+        break;
+    }
+
+    selectedObject.set(styleName, updatedValue);
+    selectedObject.setCoords(); // Update object coordinates
+    canvas.requestRenderAll();
+    updateSelectionStyles(selectedObject);
+  };
+
+  const applyListType = (type) => {
+    if (!selectedObject || !(selectedObject instanceof fabric.Textbox)) return;
+
+    let textLines = selectedObject.text.split('\n');
+
+    if (type === 'ordered') {
+      textLines = textLines.map((line, index) =>
+        `${index + 1}. ${removeListMarkers(line)}`
+      );
+    } else if (type === 'unordered') {
+      textLines = textLines.map((line) => `• ${removeListMarkers(line)}`);
+    } else {
+      // Remove list formatting
+      textLines = textLines.map((line) => removeListMarkers(line));
+    }
+
+    selectedObject.set({ text: textLines.join('\n'), listType: type });
+    selectedObject.setCoords();
+    canvas.requestRenderAll();
+    updateSelectionStyles(selectedObject);
+  };
+
+  const removeListMarkers = (line) => {
+    return line.replace(/^\d+\.\s*/, '').replace(/^•\s*/, '');
   };
 
   const handleTextChange = (e) => {
@@ -100,53 +144,10 @@ const useTextEditing = (canvas) => {
     }
   };
 
-  const handleLineHeightChange = (value) => {
-    handleStyleChange('lineHeight', value);
-  };
-
-  const handleCharSpacingChange = (value) => {
-    // Fabric.js uses charSpacing in units of 1/1000 em
-    handleStyleChange('charSpacing', value * 1000);
-  };
-
-  const handleOpacityChange = (value) => {
-    handleStyleChange('opacity', value);
-  };
-
-  const handleListTypeChange = (type) => {
-    if (selectedObject && selectedObject instanceof fabric.Textbox) {
-      let textLines = selectedObject.text.split('\n');
-
-      if (type === 'ordered') {
-        textLines = textLines.map((line, index) =>
-          `${index + 1}. ${line.replace(/^\d+\.\s*/, '').replace(/^•\s*/, '')}`
-        );
-      } else if (type === 'unordered') {
-        textLines = textLines.map(
-          (line) => `• ${line.replace(/^\d+\.\s*/, '').replace(/^•\s*/, '')}`
-        );
-      } else {
-        // Remove list formatting
-        textLines = textLines.map((line) =>
-          line.replace(/^\d+\.\s*/, '').replace(/^•\s*/, '')
-        );
-      }
-
-      selectedObject.set({ text: textLines.join('\n'), listType: type });
-      canvas.requestRenderAll();
-      updateSelectionStyles(selectedObject);
-    }
-  };
-
   return {
     selectionStyles,
-    handleStyleChange,
-    handleAlignmentChange,
+    updateTextStyle,
     handleTextChange,
-    handleLineHeightChange,
-    handleCharSpacingChange,
-    handleOpacityChange,
-    handleListTypeChange,
   };
 };
 

@@ -7,13 +7,8 @@ import { useObjectSelectionContext } from '../context/ObjectSelectionContext';
 
 const ToolProperties = ({
   selectionStyles,
-  handleStyleChange,
-  handleAlignmentChange,
   handleTextChange,
-  handleLineHeightChange,
-  handleCharSpacingChange,
-  handleOpacityChange,
-  handleListTypeChange,
+  updateTextStyle,
   imageStyles,
   handleImageStyleChange,
   addImageToCanvas,
@@ -23,19 +18,14 @@ const ToolProperties = ({
 
   const isTextSelected = selectedObject instanceof fabric.Textbox;
   const isImageSelected = selectedObject instanceof fabric.Image;
-  
+
   return (
     <div className="p-4 overflow-y-auto text-sm" style={{ width: '300px' }}>
       {isTextSelected && (
         <TextProperties
           selectionStyles={selectionStyles}
-          handleStyleChange={handleStyleChange}
-          handleAlignmentChange={handleAlignmentChange}
+          updateTextStyle={updateTextStyle}
           handleTextChange={handleTextChange}
-          handleLineHeightChange={handleLineHeightChange}
-          handleCharSpacingChange={handleCharSpacingChange}
-          handleOpacityChange={handleOpacityChange}
-          handleListTypeChange={handleListTypeChange}
         />
       )}
       {activeTool === 'image' && (
