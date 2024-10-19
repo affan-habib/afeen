@@ -1,12 +1,11 @@
 // ToolProperties.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import TextProperties from './TextProperties';
 import ImageProperties from './ImageProperties';
+import { useObjectSelectionContext } from '../context/ObjectSelectionContext';
 
 const ToolProperties = ({
-  isTextSelected,
-  isImageSelected,
   selectionStyles,
   handleStyleChange,
   handleAlignmentChange,
@@ -19,13 +18,15 @@ const ToolProperties = ({
   handleImageStyleChange,
   addImageToCanvas,
 }) => {
+  const { selectedObject } = useObjectSelectionContext(); // Use context to access selectedObject
   const activeTool = useSelector((state) => state.tool.activeTool); // Access activeTool from Redux store
 
-  console.log(activeTool, isImageSelected, isTextSelected, 'tool img text');
+  const isTextSelected = selectedObject instanceof fabric.Textbox;
+  const isImageSelected = selectedObject instanceof fabric.Image;
   
   return (
     <div className="p-4 overflow-y-auto text-sm" style={{ width: '300px' }}>
-      {activeTool === "text" && (
+      {isTextSelected && (
         <TextProperties
           selectionStyles={selectionStyles}
           handleStyleChange={handleStyleChange}

@@ -1,18 +1,19 @@
 // CanvasEditor.js
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { fabric } from 'fabric';
 import useFabricCanvas from './hooks/useFabricCanvas';
 import useObjectSelection from './hooks/useObjectSelection';
 import useTextEditing from './hooks/useTextEditing';
 import useImageEditing from './hooks/useImageEditing';
 import Tools from './components/Tools';
 import ToolProperties from './components/ToolProperties';
-import { fabric } from 'fabric';
 import TopBar from './components/TopBar';
 import Modal from './components/Modal';
 import CodeDisplay from './components/CodeDisplay';
 import PreviewDisplay from './components/PreviewDisplay';
 import { useObjectSelectionContext } from './context/ObjectSelectionContext';
+import { addTextToCanvas, addImageToCanvas } from './utils/canvasUtils';
 
 const CanvasEditor = () => {
   const canvas = useFabricCanvas();
@@ -38,12 +39,7 @@ const CanvasEditor = () => {
 
   const addText = () => {
     if (canvas) {
-      const textbox = new fabric.Textbox('Edit me', {
-        left: 100,
-        top: 100,
-        width: 200,
-        originX: 'left',
-        originY: 'top',
+      addTextToCanvas(canvas, 'Edit me', {
         fontFamily: 'Arial',
         fontSize: 20,
         fill: '#000000',
@@ -55,92 +51,16 @@ const CanvasEditor = () => {
         charSpacing: 0,
         opacity: 1,
       });
-      canvas.add(textbox);
-      canvas.setActiveObject(textbox);
-      setSelectedObject(textbox); // Manually update selectedObject
-      customizeTextControls(textbox);
       canvas.renderAll();
     }
   };
 
-  const addImageToCanvas = (url) => {
+  const addImage = (url) => {
     if (canvas) {
-      fabric.Image.fromURL(
-        url,
-        (img) => {
-          // Calculate scaling to fit within the canvas if necessary
-          const maxWidth = canvas.width * 0.8; // 80% of canvas width
-          const maxHeight = canvas.height * 0.8; // 80% of canvas height
-          let scale = 1;
-
-          if (img.width > maxWidth || img.height > maxHeight) {
-            const scaleX = maxWidth / img.width;
-            const scaleY = maxHeight / img.height;
-            scale = Math.min(scaleX, scaleY);
-          }
-
-          img.set({
-            left: canvas.width / 2,
-            top: canvas.height / 2,
-            originX: 'center',
-            originY: 'center',
-            scaleX: scale,
-            scaleY: scale,
-            selectable: true,
-            stroke: imageStyles.borderColor,
-            strokeWidth: imageStyles.borderWidth,
-          });
-
-          // Create the clipPath
-          const clipRect = new fabric.Rect({
-            left: 0,
-            top: 0,
-            originX: 'center',
-            originY: 'center',
-            width: img.width,
-            height: img.height,
-            rx: imageStyles.borderRadius,
-            ry: imageStyles.borderRadius,
-            // Inverse scaling
-            scaleX: 1 / img.scaleX,
-            scaleY: 1 / img.scaleY,
-          });
-
-          img.set({ clipPath: clipRect });
-
-          canvas.add(img);
-          canvas.setActiveObject(img);
-          setSelectedObject(img); // Manually update selectedObject
-          canvas.renderAll();
-        },
-        { crossOrigin: 'anonymous' }
-      );
+      addImageToCanvas(canvas, url, imageStyles);
+      canvas.renderAll();
     }
   };
-
-  const customizeTextControls = (textbox) => {
-    // Only adjust the width when resizing from the sides
-    textbox.setControlsVisibility({
-      mt: false,
-      mb: false,
-      ml: true,
-      mr: true,
-      tl: true,
-      tr: true,
-      bl: true,
-      br: true,
-      mtr: true,
-    });
-
-    // Override the action handler for the side controls
-    textbox.controls.ml.actionHandler = resizeTextboxWidth;
-    textbox.controls.mr.actionHandler = resizeTextboxWidth;
-  };
-
-  const resizeTextboxWidth = fabric.controlsUtils.changeWidth;
-
-  const isTextSelected = selectedObject instanceof fabric.Textbox;
-  const isImageSelected = selectedObject instanceof fabric.Image;
 
   const showCode = () => {
     // Get the canvas JSON representation
@@ -167,15 +87,13 @@ const CanvasEditor = () => {
             <Tools addText={addText} />
             {activeTool && (
               <ToolProperties
-                isTextSelected={isTextSelected}
-                isImageSelected={isImageSelected}
                 selectionStyles={selectionStyles}
                 handleStyleChange={handleStyleChange}
                 handleAlignmentChange={handleAlignmentChange}
                 handleTextChange={handleTextChange}
                 imageStyles={imageStyles}
                 handleImageStyleChange={handleImageStyleChange}
-                addImageToCanvas={addImageToCanvas}
+                addImageToCanvas={addImage}
                 handleLineHeightChange={handleLineHeightChange}
                 handleCharSpacingChange={handleCharSpacingChange}
                 handleOpacityChange={handleOpacityChange}
