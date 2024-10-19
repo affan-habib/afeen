@@ -72,4 +72,114 @@ export const addImageToCanvas = (canvas, url, imageStyles) => {
   }, { crossOrigin: 'anonymous' });
 };
 
-// You can add more functions for shapes, etc.
+// src/utils/canvasUtils.js
+
+export const getSelectionBounds = (objects) => {
+  let minLeft = Infinity;
+  let minTop = Infinity;
+  let maxRight = -Infinity;
+  let maxBottom = -Infinity;
+
+  objects.forEach((object) => {
+    const bound = object.getBoundingRect();
+
+    minLeft = Math.min(minLeft, bound.left);
+    minTop = Math.min(minTop, bound.top);
+    maxRight = Math.max(maxRight, bound.left + bound.width);
+    maxBottom = Math.max(maxBottom, bound.top + bound.height);
+  });
+
+  return {
+    left: minLeft,
+    top: minTop,
+    width: maxRight - minLeft,
+    height: maxBottom - minTop,
+  };
+};
+
+export const alignObjects = (canvas, alignment) => {
+  const activeObjects = canvas.getActiveObjects();
+  if (activeObjects.length > 1) {
+    const groupBounds = getSelectionBounds(activeObjects);
+
+    activeObjects.forEach((object) => {
+      const objectBounds = object.getBoundingRect();
+      switch (alignment) {
+        case 'left':
+          object.set('left', groupBounds.left);
+          break;
+        case 'right':
+          object.set('left', groupBounds.left + groupBounds.width - objectBounds.width);
+          break;
+        case 'center':
+          object.set('left', groupBounds.left + groupBounds.width / 2 - objectBounds.width / 2);
+          break;
+        case 'top':
+          object.set('top', groupBounds.top);
+          break;
+        case 'bottom':
+          object.set('top', groupBounds.top + groupBounds.height - objectBounds.height);
+          break;
+        case 'middle':
+          object.set('top', groupBounds.top + groupBounds.height / 2 - objectBounds.height / 2);
+          break;
+        default:
+          break;
+      }
+      object.setCoords();
+    });
+
+    canvas.requestRenderAll();
+  }
+};
+
+export const distributeObjects = (canvas, direction) => {
+  const activeObjects = canvas.getActiveObjects();
+  if (activeObjects.length > 2) {
+    activeObjects.sort((a, b) => {
+      return direction === 'horizontal' ? a.left - b.left : a.top - b.top;
+    });
+
+    const positions = activeObjects.map((obj) => ({
+      obj,
+      left: obj.left,
+      top: obj.top,
+      width: obj.getScaledWidth(),
+      height: obj.getScaledHeight(),
+    }));
+
+    const firstObj = positions[0];
+    const lastObj = positions[positions.length - 1];
+
+    const firstEdge = direction === 'horizontal' ? firstObj.left : firstObj.top;
+    const lastEdge =
+      direction === 'horizontal' ? lastObj.left + lastObj.width : lastObj.top + lastObj.height;
+
+    const totalObjectsSize = positions.reduce((sum, pos) => {
+      return sum + (direction === 'horizontal' ? pos.width : pos.height);
+    }, 0);
+
+    const totalSpace = lastEdge - firstEdge;
+    const spaceBetween = (totalSpace - totalObjectsSize) / (positions.length - 1);
+
+    let currentPos = firstEdge;
+
+    positions.forEach((pos, index) => {
+      if (index === 0) {
+        currentPos += direction === 'horizontal' ? pos.width : pos.height;
+      } else {
+        if (direction === 'horizontal') {
+          pos.obj.set('left', currentPos + spaceBetween);
+          currentPos = pos.obj.left + pos.width;
+        } else {
+          pos.obj.set('top', currentPos + spaceBetween);
+          currentPos = pos.obj.top + pos.height;
+        }
+        pos.obj.setCoords();
+      }
+    });
+
+    canvas.requestRenderAll();
+  }
+};
+

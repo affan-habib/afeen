@@ -13,7 +13,8 @@ import Modal from './components/Modal';
 import CodeDisplay from './components/CodeDisplay';
 import PreviewDisplay from './components/PreviewDisplay';
 import { useObjectSelectionContext } from './context/ObjectSelectionContext';
-import { addTextToCanvas, addImageToCanvas } from './utils/canvasUtils';
+import { addTextToCanvas, addImageToCanvas, alignObjects, distributeObjects } from './utils/canvasUtils';
+import AlignmentProperties from './components/AlignmentProperties';
 
 const CanvasEditor = () => {
   const canvas = useFabricCanvas();
@@ -70,12 +71,24 @@ const CanvasEditor = () => {
     setModalContent(<PreviewDisplay canvasData={canvasData} />);
     setModalOpen(true);
   };
+  const handleAlignObjects = (alignment) => {
+    if (canvas) {
+      alignObjects(canvas, alignment);
+    }
+  };
 
+  const handleDistributeObjects = (direction) => {
+    if (canvas) {
+      distributeObjects(canvas, direction);
+    }
+  };
   return (
     <div className="w-screen h-screen flex flex-col bg-white">
       <div className="w-full h-[80px] bg-gray-800 text-white flex items-center justify-center">
         <TopBar onShowCode={showCode} onPreview={showPreview} />
       </div>
+      <AlignmentProperties alignObjects={handleAlignObjects}
+        distributeObjects={handleDistributeObjects} />
       <div className="flex flex-1 min-h-0">
         <div className="w-100 h-full overflow-y-auto">
           <div className='flex'>
