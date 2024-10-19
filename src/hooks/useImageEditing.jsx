@@ -1,8 +1,11 @@
 // useImageEditing.js
 import { useState } from 'react';
 import { fabric } from 'fabric';
+import { useObjectSelectionContext } from '../context/ObjectSelectionContext';
 
-const useImageEditing = (canvas, selectedObject) => {
+const useImageEditing = (canvas) => {
+  const { selectedObject } = useObjectSelectionContext();
+
   const [imageStyles, setImageStyles] = useState({
     borderColor: '#000000',
     borderWidth: 0,

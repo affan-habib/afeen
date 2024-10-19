@@ -1,8 +1,10 @@
 // useTextEditing.js
 import { useState, useEffect } from 'react';
 import { fabric } from 'fabric';
+import { useObjectSelectionContext } from '../context/ObjectSelectionContext';
 
-const useTextEditing = (canvas, selectedObject) => {
+const useTextEditing = (canvas) => {
+  const { selectedObject } = useObjectSelectionContext();
   const [selectionStyles, setSelectionStyles] = useState({
     text: '',
     fontWeight: 'normal',

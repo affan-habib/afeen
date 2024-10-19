@@ -1,8 +1,9 @@
 // useObjectSelection.js
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useObjectSelectionContext } from '../context/ObjectSelectionContext';
 
 const useObjectSelection = (canvas) => {
-  const [selectedObject, setSelectedObject] = useState(null);
+  const { selectedObject, setSelectedObject } = useObjectSelectionContext(); // Ensure correct usage
 
   useEffect(() => {
     if (!canvas) return;

@@ -12,10 +12,13 @@ import TopBar from './components/TopBar';
 import Modal from './components/Modal';
 import CodeDisplay from './components/CodeDisplay';
 import PreviewDisplay from './components/PreviewDisplay';
+import { useObjectSelectionContext } from './context/ObjectSelectionContext';
 
 const CanvasEditor = () => {
   const canvas = useFabricCanvas();
-  const [selectedObject, setSelectedObject] = useObjectSelection(canvas);
+  useObjectSelection(canvas);
+  const { selectedObject, setSelectedObject } = useObjectSelectionContext();
+  console.log
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
   const activeTool = useSelector((state) => state.tool.activeTool);

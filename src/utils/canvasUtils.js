@@ -1,5 +1,7 @@
 import { fabric } from 'fabric';
 
+const generateUniqueId = () => `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
 export const addTextToCanvas = (canvas, text, styles) => {
   const textbox = new fabric.Textbox(text, {
     left: 100,
@@ -17,6 +19,7 @@ export const addTextToCanvas = (canvas, text, styles) => {
     lineHeight: styles.lineHeight || 1.16,
     charSpacing: styles.charSpacing || 0,
     opacity: styles.opacity || 1,
+    id: generateUniqueId(), // Add unique ID
   });
   canvas.add(textbox);
   canvas.setActiveObject(textbox);
@@ -45,6 +48,7 @@ export const addImageToCanvas = (canvas, url, imageStyles) => {
       selectable: true,
       stroke: imageStyles.borderColor,
       strokeWidth: imageStyles.borderWidth,
+      id: generateUniqueId(), // Add unique ID
     });
 
     const clipRect = new fabric.Rect({
